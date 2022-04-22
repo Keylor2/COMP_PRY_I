@@ -11,12 +11,16 @@ scan with {: return s.next_token; :};
 
 /* Terminales */
 // Simbolos
-terminal SYMBOL, LETRA, PLUS, MINUS, TIMES, DIV, POW, COMPLEMENT, OBRACKET, CBRACKET, OCURBRACKET, CCURBRACKET, OSQUBRACKET, CSQUBRACKET, ANDOPERATOR, OROPERATOR, EQUALS, DIFFERENT, MORETHAN, LESSTHAN, MOREEQ, LESSEQ, PLUSS, MINUSS, VAR, FUNCTION, IF, ELSE, WHILE, COMMENT, EQUAL;
-terminal NUMBERD, NUMBERP;
-terminal TRUE, FALSE; 
+terminal SYMBOL, LETRA, MAIN, OBRACKET, CBRACKET, OCURBRACKET, CCURBRACKET, OSQUBRACKET, CSQUBRACKET, HASHTAG, DOT, COLON, COMMA, VAR, FUNCTION, COMMENT, EQUAL;
+terminal PLUS, MINUS, TIMES, DIV, POW, COMPLEMENT, PLUSS, MINUSS;
+terminal ANDOPERATOR, OROPERATOR, NOTOPERATOR, EQUALS, DIFFERENT, MORETHAN, LESSTHAN, MOREEQ, LESSEQ;
+temrinal IF, ELSE, WHILE, SWITCH, CASE, DEFAULT;
+terminal NUMBERD, NUMBERP, ZERO, TRUE, FALSE;
+terminal TYPEINT, TYPEFLOAT, TYPECHAR, TYPESTRING, TYPEBOOL, NULL;
+terminal SYSPRINT, SYSREAD;
 
 /* No terminales */
-non terminal programa, comentario, bloqueCod, return, bloqueControl, break, crearFuncion, crearParametro, funcion, parametro, sentencia, crearVar
+non terminal inicio, programa, comentario, bloqueCod, return, bloqueControl, break, crearFuncion, crearParametro, funcion, parametro, sentencia, crearVar, crearAsignVar, crearElemArreglo, asignVar, asignElemArreg, salidaEst, estrucControl, if, while, switch, caso, casoDefault, condicion, expr, operando, operandoIgual, exprBin, operadorBin, exprUna, operadorUna, exprRel, operadorRel, operadorIgual, exprLog, operadorLog, id, idCuerpo, tipoFun, tipoVar, num, literal, entero, enteroPos, enteroNeg, cuerpoEnt, flotante, flotanteCero, flotantePos, flotanteNeg, caracter, string, hilera, booleano, arreglo, tipoArreglo, elemArreglo;
 
 /* Precedencia */
 precedence left OROPERATOR;
@@ -33,11 +37,11 @@ precedence left OSQUBRACKET, CSQUBRACKET, OBRACKET, CBRACKET, PLUSS, MINUSS;
 start with inicio;
 
 inicio ::= programa;	{: System.out.println("Inicio del programa";:}
-programa ::= tipoFunc MAIN OBRACKET CBRACKET OCURBRACKET bloqueCod: b1 CCURBRACKET
+programa ::= tipoFunc MAIN OBRACKET CBRACKET OCURBRACKET bloqueCod CCURBRACKET
 			| crearFuncion programa
 			| comentario programa
 ;
-comentario ::= DIV DIV hilera
+comentario ::= COMMENT hilera
 			| DIV TIMES hilera TIMES DIV
 ;
 bloqueCod ::= sentencia
@@ -49,7 +53,7 @@ bloqueCod ::= sentencia
 			| comentario bloqueCod
 ;
 return ::= RETURN literal HASHTAG
-		| ETURN expr HASHTAG
+		| RETURN expr HASHTAG
 		| RETURN id HASHTAG
 		| RETURN funcion HASHTAG
 ;
@@ -92,7 +96,173 @@ crearAsignVar ::= crearVar EQUAL literal
 				| crearVar EQUAL tipoArreglo:t2 OSQUBRACKET entero CSQUBRACKET
 				| crearVar EQUAL tipoArreglo:t2 OSQUBRACKET expr CSQUBRACKET
 				| crearVar EQUAL tipoArreglo:t2 OSQUBRACKET id CSQUBRACKET
+				| crearVar EQUAL OCURBRACKET crearElemArreglo CCURBRACKET
 ;
+crearElemArreglo ::= num
+					| caracter
+					| num COMMA crearElemArreglo
+					| caracter COMMA crearElemArreglo
+;
+asignVar ::= id EQUAL literal
+			| id EQUAL expr
+			| id EQUAL id
+			| id EQUAL funcion
+			| id EQUAL NULL
+;
+asignElemArreg ::= elemArreglo EQUAL entero
+				| elemArreglo EQUAL caracter
+				| elemArreglo EQUAL expr
+				| elemArreglo EQUAL id
+				| elemArreglo EQUAL funcion
+;
+salidaEst ::= SYSPRINT OBRACKET literal CBRACKET
+			| SYSPRINT OBRACKET id CBRACKET
+;
+
+estrucControl ::= if
+				| while
+				| switch
+;
+if ::= IF OBRACKET condicion CBRACKET OCURBRACKET bloqueControl CCURBRACKET
+	| IF OBRACKET condicion CBRACKET OCURBRACKET bloqueControl CCURBRACKET ELSE OCURBRACKET bloqueControl CCURBRACKET
+;
+while ::= WHILE OBRACKET condicion CBRACKET OCURBRACKET bloqueControl CCURBRACKET;
+switch ::= SWITCH OBRACKET expr CBRACKET OCURBRACKET caso casoDefault CCURBRACKET
+		| SWITCH OBRACKET id CBRACKET OCURBRACKET caso casoDefault CCURBRACKET
+		| SWITCH OBRACKET funcion CBRACKET OCURBRACKET caso casoDefault CCURBRACKET
+;
+caso ::= CASE COLON literal OCURBRACKET bloqueControl CCURBRACKET
+		| CASE COLON literal OCURBRACKET bloqueControl CCURBRACKET caso
+;
+casoDefault ::= DEFAULT OCURBRACKET bloqueControl CCURBRACKET;
+condicion ::= booleano
+			| exprRel
+			| exprLog
+;
+
+expr ::= epxrBin
+		| exprUna
+		| exprRel
+		| exprLog
+;
+
+operando ::= literal
+			| id
+			| funcion
+			| expr
+			| OBRACKET expr CBRACKET
+;
+operandoIgual ::= operando
+				| NULL
+;
+exprBin ::= operando operadorBin operando;
+operadorBin ::= PLUS
+				| MINUS
+				| DIV
+				| TIMES
+				| COMPLEMENT
+				| POW
+;
+exprUna ::= operando operadorUna
+			| MINUS operando
+			%prec MINUSUNA
+;
+operadorUna ::= MINUSS
+				| PLUSS
+;
+exprRel ::= operando operadorRel operando
+			| operandoIgual operadorIgual operandoIgual
+;
+operadorRel ::= MORETHAN
+				| LESSTHAN
+				| MOREEQ
+				| LESSEQ
+;
+operadorIgual ::= EQUALS
+				| DIFFERENT
+;
+exprLog ::= operando operadorLog operando
+			| NOTOPERATOR operando
+;
+operadorLog ::= ANDOPERATOR
+				| OROPERATOR
+;
+
+//Identificadores
+id ::= LETRA
+	| LETRA idCuerpo
+;
+idCuerpo ::= LETRA
+			| NUMBERD
+			| SYMBOL
+			| LETRA idCuerpo
+			| NUMBERD idCuerpo
+			| SYMBOL idCuerpo
+;
+tipoFun ::= TYPEINT
+			| TYPEFLOAT
+			| TYPECHAR
+;
+tipoVar ::= TYPEINT
+			| TYPEFLOAT
+			| TYPECHAR
+			| TYPEBOOL
+			| TYPESTRING
+			| arreglo
+;
+num ::= entero
+		| flotante
+;
+literal ::= num
+			| caracter
+			| string
+			| booleano
+			| elemArreglo
+;
+
+//Enteros
+entero ::= ZERO
+			| enteroPos
+			| enteroNeg
+;
+enteroPos ::= NUMBERD
+			| NUMBERD cuerpoEnt
+;
+enteroNeg ::= MINUS enteroPos;
+cuerpoEnt ::= NUMBERD
+			| NUMBERD cuerpoEnt
+;
+
+//Flotantes
+flotante ::= flotanteCero
+			| flotantePos
+			| flotanteNeg
+;
+flotanteCero ::= ZERO DOT cuerpoEnt;
+flotantePos ::= enteroPos DOT cuerpoEnt;
+flotanteNeg ::= MINUS flotanteCero
+				| MINUS flotantePos
+;
+
+//Char
+caracter ::= SYMBOL LETRA SYMBOL;
+
+//String
+string ::= SYMBOL hilera SYMBOL;
+hilera ::= LETRA
+			| NUMBERD
+			| SYMBOL
+			| LETRA hilera
+			| NUMBERD hilera
+			| SYMBOL hilera
+;
+
+//Booleanos
+booleano ::= TRUE
+			| FALSE
+;
+
+//Arreglos
 arreglo ::= tipoArreglo OSQUBRACKET CSQUBRACKET;
 tipoArreglo ::= TYPEINT
 			| TYPECHAR

@@ -19,6 +19,7 @@ simbolo	    = [|°¬!#$%&/()='?¿¡´¨+*~{[^}]`,;.:-_<>]
 
 %%
 
+{zero} {System.out.println("ZERO");return new Symbol(sym.ZERO);}
 {digD}	    {System.out.println("Only one digit:"+yytext());return new Symbol(sym.NUMBERD);}
 {digP}	    {System.out.println("Another digit:"+yytext());return new Symbol(sym.NUMBERP);}
 {simbolo}	{System.out.println("Whatever symbol:"+yytext());return new Symbol(sym.SYMBOL);}
@@ -40,8 +41,8 @@ simbolo	    = [|°¬!#$%&/()='?¿¡´¨+*~{[^}]`,;.:-_<>]
 "&"		{System.out.println("AND");return new Symbol(sym.ANDOPERTATOR);}
 "|"		{System.out.println("OR");return new Symbol(sym.OROPERATOR);}
 
-"=="	{System.out.println("OPEN BRACKET");return new Symbol(sym.EQUALS);}
-"!="	{System.out.println("CLOSE BRACKET");return new Symbol(sym.DIFFERENT);}
+"=="	{System.out.println("EQUALS");return new Symbol(sym.EQUALS);}
+"!="	{System.out.println("DIFFERENT");return new Symbol(sym.DIFFERENT);}
 
 ">"		{System.out.println("MORE THAN");return new Symbol(sym.MORETHAN);}
 "<"		{System.out.println("LESS THAN");return new Symbol(sym.LESSTHAN);}
@@ -59,6 +60,7 @@ simbolo	    = [|°¬!#$%&/()='?¿¡´¨+*~{[^}]`,;.:-_<>]
 "if"     {System.out.println("IF");return new Symbol(sym.IF);}
 "else"   {System.out.println("ELSE");return new Symbol(sym.ELSE);}
 "while"  {System.out.println("WHILE");return new Symbol(sym.WHILE);}
+"switch" {System.out.println("SWITCH");return new Symbol(sym.SWITCH);}
 
 "//"    {System.out.println("COMMENT");return new Symbol(sym.COMMENT);}
 
@@ -80,6 +82,7 @@ simbolo	    = [|°¬!#$%&/()='?¿¡´¨+*~{[^}]`,;.:-_<>]
 "break"  {System.out.println("BREAK:"+yytext());return new Symbol(sym.BREAK);}
 "return" {System.out.println("RETURN:"+yytext());return new Symbol(sym.RETURN);}
 "case"   {System.out.println("CASE:"+yytext());return new Symbol(sym.CASE);}
+"default"   {System.out.println("DEFAULT:"+yytext());return new Symbol(sym.DEFAULT);}
 "sysRead"  {System.out.println("SYSREAD:"+yytext());return new Symbol(sym.SYSREAD);}
 "sisPrint"  {System.out.println("SISPRINT:"+yytext());return new Symbol(sym.SISPRINT);}
 
