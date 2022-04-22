@@ -40,6 +40,7 @@ simbolo	    = [|°¬!#$%&/()='?¿¡´¨+*~{[^}]`,;.:-_<>]
 
 "&"		{System.out.println("AND");return new Symbol(sym.ANDOPERTATOR);}
 "|"		{System.out.println("OR");return new Symbol(sym.OROPERATOR);}
+"!"		{System.out.println("NOT");return new Symbol(sym.NOTOPERATOR);}
 
 "=="	{System.out.println("EQUALS");return new Symbol(sym.EQUALS);}
 "!="	{System.out.println("DIFFERENT");return new Symbol(sym.DIFFERENT);}
