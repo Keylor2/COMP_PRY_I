@@ -88,6 +88,8 @@ tipoVar     = "int"|"float"|"char"|"bool"|"string"
 "sysRead"  {System.out.println("SYSREAD:"+yytext());return new Symbol(sym.SYSREAD);}
 "sisPrint"  {System.out.println("SISPRINT:"+yytext());return new Symbol(sym.SISPRINT);}
 
+"null"  {System.out.println("NULL:"+yytext());return new Symbol(sym.NULL);}
+
 {nl}|" " 	{;}
 
 .		{System.out.println("Error:" + yytext());}
