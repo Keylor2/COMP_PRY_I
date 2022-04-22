@@ -19,6 +19,7 @@ simbolo	    = [|°¬!#$%&/()='?¿¡´¨+*~{[^}]`,;.:-_<>]
 tipoFun     = "int"|"float"|"char"
 tipoVar     = "int"|"float"|"char"|"bool"|"string"
 
+//principal
 
 
 %%
@@ -27,6 +28,7 @@ tipoVar     = "int"|"float"|"char"|"bool"|"string"
 {digP}	    {System.out.println("Another digit:"+yytext());return new Symbol(sym.NUMBERP);}
 {simbolo}	{System.out.println("Whatever symbol:"+yytext());return new Symbol(sym.SYMBOL);}
 {letra}	    {System.out.println("Whatever symbol:"+yytext());return new Symbol(sym.LETRA);}
+
 
 "+"		{System.out.println("PLUS");return new Symbol(sym.PLUS);}
 "-"		{System.out.println("MINUS");return new Symbol(sym.MINUS);}
@@ -63,10 +65,28 @@ tipoVar     = "int"|"float"|"char"|"bool"|"string"
 "else"   {System.out.println("ELSE");return new Symbol(sym.ELSE);}
 "while"  {System.out.println("WHILE");return new Symbol(sym.WHILE);}
 
-"//"  {System.out.println("COMMENT");return new Symbol(sym.COMMENT);}
+"//"    {System.out.println("COMMENT");return new Symbol(sym.COMMENT);}
 
 
-"="		{System.out.println("EQUAL");return new Symbol(sym.EQUAL);}
+"{"      {System.out.println("OCURBRACKET");return new Symbol(sym.OCURBRACKET);}
+"}"      {System.out.println("CCURBRACKET");return new Symbol(sym.CCURBRACKET);}
+
+"["      {System.out.println("OSQUBRACKET");return new Symbol(sym.OSQUBRACKET);}
+"]"      {System.out.println("CSQUBRACKET");return new Symbol(sym.CSQUBRACKET);}
+
+"#"      {System.out.println("HASHTAG");return new Symbol(sym.HASHTAG);}
+
+"."      {System.out.println("DOT");return new Symbol(sym.DOT);}
+":"		 {System.out.println("COLON");return new Symbol(sym.COLON);}
+","      {System.out.println("COMMA");return new Symbol(sym.COMMA);}
+
+
+"main"   {System.out.println("Main function:"+yytext());return new Symbol(sym.MAIN);}
+"break"  {System.out.println("BREAK:"+yytext());return new Symbol(sym.BREAK);}
+"return" {System.out.println("RETURN:"+yytext());return new Symbol(sym.RETURN);}
+"case"   {System.out.println("CASE:"+yytext());return new Symbol(sym.CASE);}
+"sysRead"  {System.out.println("SYSREAD:"+yytext());return new Symbol(sym.SYSREAD);}
+"sisPrint"  {System.out.println("SISPRINT:"+yytext());return new Symbol(sym.SISPRINT);}
 
 {nl}|" " 	{;}
 
