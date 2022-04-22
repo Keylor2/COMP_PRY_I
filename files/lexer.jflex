@@ -14,11 +14,6 @@ zero        =  0
 letra       = [a-zA-Z]
 simbolo	    = [|°¬!#$%&/()='?¿¡´¨+*~{[^}]`,;.:-_<>]
 
-//Tipos de funcion
-
-tipoFun     = "int"|"float"|"char"
-tipoVar     = "int"|"float"|"char"|"bool"|"string"
-
 //principal
 
 
@@ -89,6 +84,12 @@ tipoVar     = "int"|"float"|"char"|"bool"|"string"
 "sisPrint"  {System.out.println("SISPRINT:"+yytext());return new Symbol(sym.SISPRINT);}
 
 "null"  {System.out.println("NULL:"+yytext());return new Symbol(sym.NULL);}
+
+"int"	{System.out.println("Tipo int");return new Symbol(sym.TYPEINT);}
+"float"	{System.out.println("Tipo float");return new Symbol(sym.TYPEFLOAT);}
+"char"	{System.out.println("Tipo char");return new Symbol(sym.TYPECHAR);}
+"string" {System.out.println("Tipo string");return new Symbol(sym.TYPESTRING);}
+"bool"	{System.out.println("Tipo bool");return new Symbol(sym.TYPEBOOL);}
 
 {nl}|" " 	{;}
 

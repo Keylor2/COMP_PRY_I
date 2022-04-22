@@ -1,0 +1,103 @@
+import java_cup.runtime.*;
+
+//Conectar el scanner al parser
+parser code {:
+	scanner s;
+	Parser(scanner s){this.s=s; }
+:}
+
+init with {: s.init();			:};
+scan with {: return s.next_token; :};
+
+/* Terminales */
+// Simbolos
+terminal SYMBOL, LETRA, PLUS, MINUS, TIMES, DIV, POW, COMPLEMENT, OBRACKET, CBRACKET, OCURBRACKET, CCURBRACKET, OSQUBRACKET, CSQUBRACKET, ANDOPERATOR, OROPERATOR, EQUALS, DIFFERENT, MORETHAN, LESSTHAN, MOREEQ, LESSEQ, PLUSS, MINUSS, VAR, FUNCTION, IF, ELSE, WHILE, COMMENT, EQUAL;
+terminal NUMBERD, NUMBERP;
+terminal TRUE, FALSE; 
+
+/* No terminales */
+non terminal programa, comentario, bloqueCod, return, bloqueControl, break, crearFuncion, crearParametro, funcion, parametro, sentencia, crearVar
+
+/* Precedencia */
+precedence left OROPERATOR;
+precedence left ANDOPERATOR;
+precedence left EQUALS, DIFFERENT;
+precedence left MORETHAN, LESSTHAN, MOREEQ, LESSEQ;
+precedence left PLUS, MINUS;
+precendece left TIMES, DIV, COMPLEMENT;
+precedence left POW;
+precedence right MINUSUNA, NOTOPERATOR;
+precedence left OSQUBRACKET, CSQUBRACKET, OBRACKET, CBRACKET, PLUSS, MINUSS;
+
+/* Gramatica */
+start with inicio;
+
+inicio ::= programa;	{: System.out.println("Inicio del programa";:}
+programa ::= tipoFunc MAIN OBRACKET CBRACKET OCURBRACKET bloqueCod: b1 CCURBRACKET
+			| crearFuncion programa
+			| comentario programa
+;
+comentario ::= DIV DIV hilera
+			| DIV TIMES hilera TIMES DIV
+;
+bloqueCod ::= sentencia
+			| estrucControl
+			| return
+			| comentario
+			| sentencia bloqueCod
+			| estrucControl bloqueCod
+			| comentario bloqueCod
+;
+return ::= RETURN literal HASHTAG
+		| ETURN expr HASHTAG
+		| RETURN id HASHTAG
+		| RETURN funcion HASHTAG
+;
+bloqueControl ::= bloqueCod
+				| break
+;
+break ::= BREAK HASHTAG;
+crearFuncion ::= tipoFun id OBRACKET CBRACKET OCURBRACKET bloqueCod CCURBRACKET
+				| tipoFun id OBRACKET crearParametro CBRACKET OCURBRACKET bloqueCod CCURBRACKET
+;
+crearParametro ::= tipoVar id
+				| tipoVar id COMMA crearParametro
+;
+funcion ::= id OBRACKET CBRACKET
+		  | id OBRACKET parametro CBRACKET
+		  | SYSREAD OBRACKET CBRACKET
+;
+parametro ::= literal
+			| expr
+			| id
+			| funcion
+			| literal COMMA parametro
+			| expr COMMA parametro
+			| id COMMA parametro
+			| funcion COMMA parametro
+;
+sentencia ::= crearVar HASHTAG
+			| crearAsignVar HASHTAG
+			| asignVar HASHTAG
+			| asignElemArreg HASHTAG
+			| expr HASHTAG
+			| salidaEst HASHTAG
+;
+crearVar ::= tipoVar:t1 id;
+crearAsignVar ::= crearVar EQUAL literal
+				| crearVar EQUAL expr
+				| crearVar EQUAL id
+				| crearVar EQUAL funcion
+				| crearVar EQUAL NULL
+				| crearVar EQUAL tipoArreglo:t2 OSQUBRACKET entero CSQUBRACKET
+				| crearVar EQUAL tipoArreglo:t2 OSQUBRACKET expr CSQUBRACKET
+				| crearVar EQUAL tipoArreglo:t2 OSQUBRACKET id CSQUBRACKET
+;
+arreglo ::= tipoArreglo OSQUBRACKET CSQUBRACKET;
+tipoArreglo ::= TYPEINT
+			| TYPECHAR
+;
+elemArreglo ::= id OSQUBRACKET NUMBERD CSQUBRACKET
+				| id OSQUBRACKET id CSQUBRACKET
+				| id OSQUBRACKET funcion CSQUBRACKET
+;
