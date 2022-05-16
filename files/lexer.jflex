@@ -2,99 +2,203 @@ import java_cup.runtime.*;
 
 %%
 
+%class Lexer
 %unicode
 %cup
+%line
+%column
 
-//Simbolos
+%{
+//Almacena el valor al leer strings
+StringBuffer string = new StringBuffer();
 
-nl		    =  \n|\r|\r\n
-digD    	=  [0-9]
-digP        =  [1-9]
-zero        =  0
-letra       = [a-zA-Z]
-simbolo	    = [|°¬!#$%&/()='?¿¡´¨+*~{[^}]`,;.:-_<>]
+//Fabricas de simbolos
+private Symbol symbol(int type) {
+	return symbol(type, yyline, yycolumn);
+}
+private Symbol symbol(int type, Object value) {
+	return symbol(type, yyline, yycolumn, value);
+}
+%}
 
-//principal
+//----Declaraciones----
+FinLinea = \n|\r|\r\n
+EspacioBlanco = {FinLinea} | [ \t\f]
+
+//Comentarios
+CaracterComentario = [^\r\n]
+
+Comentario = {ComentarioMulti} | {ComentarioLinea}
+ComentarioMulti = "/*" [^*] ~"*/" | "/*" "*"+ "/"
+ComentarioLinea = "//" {CaracterComentario}* {FinLinea}
+
+//Identificadores
+Identificador = [:jletter:][:jletterdigit:]*
+
+//Enteros
+Entero = 0 | {EnteroPositivo} | {EnteroNegativo}
+EnteroPositivo = [1-9][0-9]*
+EnteroNegativo = -{EnteroPositivo}
+
+//Flotantes
+Flotante = {FlotanteCero} | {FlotantePositivo} | {FlotanteNegativo}
+FlotanteCero = 0\.[0-9]+
+FlotantePositivo = EnteroPositivo\.[0-9]+
+FlotanteNegativo = -{FlotanteCero} | -{FlotantePositivo}
+
+//Strings
+CaracterString = [^\r\n\"\\]
+
+//Chars
+CaracterChar = [^\r\n\'\\]
+
+//Estados adicionales
+%state STRING, CHAR
 
 
 %%
+//----Reglas lexicas----
 
-{zero} {System.out.println("ZERO");return new Symbol(sym.ZERO);}
-{digD}	    {System.out.println("Only one digit:"+yytext());return new Symbol(sym.NUMBERD);}
-{digP}	    {System.out.println("Another digit:"+yytext());return new Symbol(sym.NUMBERP);}
-{simbolo}	{System.out.println("Whatever symbol:"+yytext());return new Symbol(sym.SYMBOL);}
-{letra}	    {System.out.println("Whatever symbol:"+yytext());return new Symbol(sym.LETRA);}
+<YYINITIAL> {
+	//Palabras clave
+	"bool"		{System.out.println("TIPO BOOL");return symbol(TYPEBOOL);}
+	"break"  	{System.out.println("BREAK");return symbol(BREAK);}
+	"case"   	{System.out.println("CASE");return symbol(CASE);}
+	"char"		{System.out.println("TIPO CHAR");return symbol(TYPECHAR);}
+	"default"  	{System.out.println("DEFAULT");return symbol(DEFAULT);}
+	"else"   	{System.out.println("ELSE");return symbol(ELSE);}
+	"float"		{System.out.println("TIPO FLOAT");return symbol(TYPEFLOAT);}
+	"function" 	{System.out.println("FUNCTION");return symbol(FUNCTION);}
+	"if"     	{System.out.println("IF");return symbol(IF);}
+	"int"		{System.out.println("TIPO INT");return symbol(TYPEINT);}
+	"main"   	{System.out.println("MAIN");return symbol(MAIN);}
+	"null"		{System.out.println("NULL");return symbol(NULL);}
+	"return" 	{System.out.println("RETURN");return symbol(RETURN);}
+	"string"	{System.out.println("TIPO STRING");return symbol(TYPESTRING);}
+	"switch" 	{System.out.println("SWITCH");return symbol(SWITCH);}
+	"while"  	{System.out.println("WHILE");return symbol(WHILE);}
+	
+	//Entrada y salida estandar
+	"sysRead"	{System.out.println("SYSREAD");return symbol(SYSREAD);}
+	"sysPrint"  {System.out.println("SYSPRINT");return symbol(SYSPRINT);}
+	
+	//Separadores
+	"("	{System.out.println("PAR ABRIR");return symbol(PARABR);}
+	")"	{System.out.println("PAR CERRAR");return symbol(PARCER);}
+	"{"	{System.out.println("PAR CURS ABRIR");return symbol(PARCURSABR);}
+	"}"	{System.out.println("PAR CURS CERRAR");return symbol(PARCURSCER);}
+	"["	{System.out.println("PAR CUAD ABRIR");return symbol(PARCUADABR);}
+	"]"	{System.out.println("PAR CUAD CERRAR");return symbol(PARCUADCER);}
+	"#"	{System.out.println("HASHTAG");return symbol(HASHTAG);}
+	"."	{System.out.println("PUNTO");return symbol(PUNTO);}
+	":"	{System.out.println("DOS PUNTOS");return symbol(DOSPUNTOS);}
+	","	{System.out.println("COMA");return symbol(COMA);}
+	
+	//Operadores
+	"="		{System.out.println("IGUAL");return symbol(IGUAL);}
+	"+"		{System.out.println("MAS");return symbol(MAS);}
+	"-"		{System.out.println("MENOS");return symbol(MENOS);}
+	"*"		{System.out.println("POR");return symbol(POR);}
+	"/"		{System.out.println("DIV");return symbol(DIV);}
+	"^"		{System.out.println("POTENCIA");return symbol(POTENCIA);}
+	"~"		{System.out.println("COMPLEMENTO");return symbol(COMPLEMENTO);}
+	"&"		{System.out.println("AND");return symbol(AND);}
+	"|"		{System.out.println("OR");return symbol(OR);}
+	"!"		{System.out.println("NOT");return symbol(NOT);}
+	"=="	{System.out.println("ES IGUAL");return symbol(ESIGUAL);}
+	"!="	{System.out.println("DIFERENTE");return symbol(DIFERENTE);}
+	">"		{System.out.println("MAYOR QUE");return symbol(MAYOR);}
+	"<"		{System.out.println("MENOR QUE");return symbol(MENOR);}
+	">="	{System.out.println("MAYOR IGUAL QUE");return symbol(MAYORIGUAL);}
+	"<="	{System.out.println("MENOR IGUAL QUE");return symbol(MENORIGUAL);}
+	"++"	{System.out.println("MAS MAS");return symbol(MASMAS);}
+	"--"	{System.out.println("MENOS MENOS");return symbol(MENOSMENOS);}
+	
+	//Literales
+	//-Numeros
+	{Entero}	{System.out.println("LITERAL ENTERO");return symbol(LIT_ENTERO, new Integer.valueOf(yytext()));}
+	{Flotante}	{System.out.println("LITERAL FLOTANTE");return symbol(LIT_FLOTANTE, new Float.valueOf(yytext()));}
+	
+	//-Booleanos
+	"true"		{System.out.println("LITERAL TRUE");return symbol(LIT_BOOLEANO, true);}
+	"false"		{System.out.println("LITERAL FALSE");return symbol(LIT_BOOLEANO, false);}
+	
+	//-Chars (Cambio de seccion)
+	\'			{yybegin(CHAR)}
+	
+	//-Strings (Cambio de seccion)
+	\"			{yybegin(STRING); string.setLength(0);}
+	
+	
+	//Identificador
+	{Identificador} 	{System.out.println("IDENTIFICADOR");return symbol(IDENTIF, yytext();)}
+	
+	//Comentarios
+	{Comentario}		{System.out.println("COMENTARIO");}
+	
+	//Espacio en blanco
+	{EspacioBlanco}		{ /* Ignorar */ }
+}
 
+<STRING> {
+	\"					{yybegin(YYINITIAL);
+						 System.out.println("LITERAL STRING");
+						 return symbol(LIT_STRING, string.toString());}
+	{CaracterString}+	{string.append( yytext() );}
+	
+	//Secuencias de escape de caracteres
+	"\\b"				{string.append( '\b' );}
+	"\\t"				{string.append( '\t' );}
+	"\\n"				{string.append( '\n' );}
+	"\\f"				{string.append( '\f' );}
+	"\\r"				{string.append( '\r' );}
+	"\\\""				{string.append( '\"' );}
+	"\\'"				{string.append( '\'' );}
+	"\\\\"				{string.append( '\\' );}
+	
+	//Errores
+	\\.	{throw new RuntimeException("Secuencia de escape ilegal <" + yytext() + ">");}
+	{FinLinea}	{throw new RuntimeException("String incompleta al final de linea");}
+}
 
-"+"		{System.out.println("PLUS");return new Symbol(sym.PLUS);}
-"-"		{System.out.println("MINUS");return new Symbol(sym.MINUS);}
+<CHAR> {
+	{CaracterChar}\'	{yybegin(YYINITIAL);
+						 System.out.println("LITERAL CHAR");
+						 return symbol(LIT_CHAR, yytext().charAt(0));}
+	
+	//Secuencias de escape de caracteres
+	"\\b"\'				{yybegin(YYINITIAL);
+						 System.out.println("LITERAL CHAR");
+						 return symbol(LIT_CHAR, '\b');}
+	"\\t"\'				{yybegin(YYINITIAL);
+						 System.out.println("LITERAL CHAR");
+						 return symbol(LIT_CHAR, '\t');}
+	"\\n"\'				{yybegin(YYINITIAL);
+						 System.out.println("LITERAL CHAR");
+						 return symbol(LIT_CHAR, '\n');}
+	"\\f"\'				{yybegin(YYINITIAL);
+						 System.out.println("LITERAL CHAR");
+						 return symbol(LIT_CHAR, '\f');}
+	"\\r"\'				{yybegin(YYINITIAL);
+						 System.out.println("LITERAL CHAR");
+						 return symbol(LIT_CHAR, '\r');}
+	"\\\""\'			{yybegin(YYINITIAL);
+						 System.out.println("LITERAL CHAR");
+						 return symbol(LIT_CHAR, '\"');}
+	"\\'"\'				{yybegin(YYINITIAL);
+						 System.out.println("LITERAL CHAR");
+						 return symbol(LIT_CHAR, '\'');}	
+	"\\\\"\'			{yybegin(YYINITIAL);
+						 System.out.println("LITERAL CHAR");
+						 return symbol(LIT_CHAR, '\\');}
 
-"*"		{System.out.println("TIMES");return new Symbol(sym.TIMES);}
-"/"		{System.out.println("DIV");return new Symbol(sym.DIV);}
+	//Errores
+	\\.	{throw new RuntimeException("Secuencia de escape ilegal <" + yytext() + ">");}
+	{FinLinea}	{throw new RuntimeException("Literal caracter incompleto al final de linea");}
+}
 
-"^"		{System.out.println("POW");return new Symbol(sym.POW);}
-"~"		{System.out.println("COMPLEMENT");return new Symbol(sym.COMPLEMENT);}
+//Error: caracter invalido
+[^]		{throw new RuntimeException("Caracter ilegal <" + yytext() + "> en la linea " + yyline + ", columna " + yycolumn);}
 
-"("		{System.out.println("OPEN BRACKET");return new Symbol(sym.OBRACKET);}
-")"		{System.out.println("CLOSE BRACKET");return new Symbol(sym.CBRACKET);}
-
-"&"		{System.out.println("AND");return new Symbol(sym.ANDOPERTATOR);}
-"|"		{System.out.println("OR");return new Symbol(sym.OROPERATOR);}
-"!"		{System.out.println("NOT");return new Symbol(sym.NOTOPERATOR);}
-
-"=="	{System.out.println("EQUALS");return new Symbol(sym.EQUALS);}
-"!="	{System.out.println("DIFFERENT");return new Symbol(sym.DIFFERENT);}
-
-">"		{System.out.println("MORE THAN");return new Symbol(sym.MORETHAN);}
-"<"		{System.out.println("LESS THAN");return new Symbol(sym.LESSTHAN);}
-">="	{System.out.println("MORE EQUAL THAN");return new Symbol(sym.MOREEQ);}
-"<="	{System.out.println("LESS EQUAL THAN");return new Symbol(sym.LESSEQ);}
-
-"++"	{System.out.println("PLUS UNARY");return new Symbol(sym.PLUSS);}
-"--"	{System.out.println("LESS UNARY");return new Symbol(sym.MINUSS);}
-
-"true"	{System.out.println("BOOLEAN TRUE");return new Symbol(sym.TRUE);}
-"false"	{System.out.println("BOOLEAN FALSE");return new Symbol(sym.FALSE);}
-
-"var"   {System.out.println("VARIABLE");return new Symbol(sym.VAR);}
-"function" {System.out.println("FUNCTION");return new Symbol(sym.FUNCTION);}
-"if"     {System.out.println("IF");return new Symbol(sym.IF);}
-"else"   {System.out.println("ELSE");return new Symbol(sym.ELSE);}
-"while"  {System.out.println("WHILE");return new Symbol(sym.WHILE);}
-"switch" {System.out.println("SWITCH");return new Symbol(sym.SWITCH);}
-
-"//"    {System.out.println("COMMENT");return new Symbol(sym.COMMENT);}
-
-
-"{"      {System.out.println("OCURBRACKET");return new Symbol(sym.OCURBRACKET);}
-"}"      {System.out.println("CCURBRACKET");return new Symbol(sym.CCURBRACKET);}
-
-"["      {System.out.println("OSQUBRACKET");return new Symbol(sym.OSQUBRACKET);}
-"]"      {System.out.println("CSQUBRACKET");return new Symbol(sym.CSQUBRACKET);}
-
-"#"      {System.out.println("HASHTAG");return new Symbol(sym.HASHTAG);}
-
-"."      {System.out.println("DOT");return new Symbol(sym.DOT);}
-":"		 {System.out.println("COLON");return new Symbol(sym.COLON);}
-","      {System.out.println("COMMA");return new Symbol(sym.COMMA);}
-
-
-"main"   {System.out.println("Main function:"+yytext());return new Symbol(sym.MAIN);}
-"break"  {System.out.println("BREAK:"+yytext());return new Symbol(sym.BREAK);}
-"return" {System.out.println("RETURN:"+yytext());return new Symbol(sym.RETURN);}
-"case"   {System.out.println("CASE:"+yytext());return new Symbol(sym.CASE);}
-"default"   {System.out.println("DEFAULT:"+yytext());return new Symbol(sym.DEFAULT);}
-"sysRead"  {System.out.println("SYSREAD:"+yytext());return new Symbol(sym.SYSREAD);}
-"sisPrint"  {System.out.println("SISPRINT:"+yytext());return new Symbol(sym.SISPRINT);}
-
-"null"  {System.out.println("NULL:"+yytext());return new Symbol(sym.NULL);}
-
-"int"	{System.out.println("Tipo int");return new Symbol(sym.TYPEINT);}
-"float"	{System.out.println("Tipo float");return new Symbol(sym.TYPEFLOAT);}
-"char"	{System.out.println("Tipo char");return new Symbol(sym.TYPECHAR);}
-"string" {System.out.println("Tipo string");return new Symbol(sym.TYPESTRING);}
-"bool"	{System.out.println("Tipo bool");return new Symbol(sym.TYPEBOOL);}
-
-{nl}|" " 	{;}
-
-.		{System.out.println("Error:" + yytext());}
+//Fin del archivo
+<<EOF>>                          { return symbol(EOF); }
