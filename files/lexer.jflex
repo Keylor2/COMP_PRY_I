@@ -61,20 +61,20 @@ CaracterChar = [^\r\n\'\\]
 
 <YYINITIAL> {
 	//Palabras clave
-	"bool"		{System.out.println("TIPO BOOL");return symbol(TYPEBOOL);}
+	"bool"		{System.out.println("TIPO BOOL");return symbol(TIPO_BOOL);}
 	"break"  	{System.out.println("BREAK");return symbol(BREAK);}
 	"case"   	{System.out.println("CASE");return symbol(CASE);}
-	"char"		{System.out.println("TIPO CHAR");return symbol(TYPECHAR);}
+	"char"		{System.out.println("TIPO CHAR");return symbol(TIPO_CHAR);}
 	"default"  	{System.out.println("DEFAULT");return symbol(DEFAULT);}
 	"else"   	{System.out.println("ELSE");return symbol(ELSE);}
-	"float"		{System.out.println("TIPO FLOAT");return symbol(TYPEFLOAT);}
+	"float"		{System.out.println("TIPO FLOAT");return symbol(TIPO_FLOAT);}
 	"function" 	{System.out.println("FUNCTION");return symbol(FUNCTION);}
 	"if"     	{System.out.println("IF");return symbol(IF);}
-	"int"		{System.out.println("TIPO INT");return symbol(TYPEINT);}
+	"int"		{System.out.println("TIPO INT");return symbol(TIPO_INT);}
 	"main"   	{System.out.println("MAIN");return symbol(MAIN);}
 	"null"		{System.out.println("NULL");return symbol(NULL);}
 	"return" 	{System.out.println("RETURN");return symbol(RETURN);}
-	"string"	{System.out.println("TIPO STRING");return symbol(TYPESTRING);}
+	"string"	{System.out.println("TIPO STRING");return symbol(TIPO_STRING);}
 	"switch" 	{System.out.println("SWITCH");return symbol(SWITCH);}
 	"while"  	{System.out.println("WHILE");return symbol(WHILE);}
 	
