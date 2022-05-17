@@ -68,7 +68,6 @@ CaracterChar = [^\r\n\'\\]
 	"default"  	{System.out.println("DEFAULT");return symbol(DEFAULT);}
 	"else"   	{System.out.println("ELSE");return symbol(ELSE);}
 	"float"		{System.out.println("TIPO FLOAT");return symbol(TIPO_FLOAT);}
-	"function" 	{System.out.println("FUNCTION");return symbol(FUNCTION);}
 	"if"     	{System.out.println("IF");return symbol(IF);}
 	"int"		{System.out.println("TIPO INT");return symbol(TIPO_INT);}
 	"main"   	{System.out.println("MAIN");return symbol(MAIN);}
@@ -90,7 +89,6 @@ CaracterChar = [^\r\n\'\\]
 	"["	{System.out.println("PAR CUAD ABRIR");return symbol(PARCUADABR);}
 	"]"	{System.out.println("PAR CUAD CERRAR");return symbol(PARCUADCER);}
 	"#"	{System.out.println("HASHTAG");return symbol(HASHTAG);}
-	"."	{System.out.println("PUNTO");return symbol(PUNTO);}
 	":"	{System.out.println("DOS PUNTOS");return symbol(DOSPUNTOS);}
 	","	{System.out.println("COMA");return symbol(COMA);}
 	

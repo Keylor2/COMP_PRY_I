@@ -1,85 +1,121 @@
 import java_cup.runtime.*;
 
-//Conectar el scanner al parser
-parser code {:
-	scanner s;
-	Parser(scanner s){this.s=s; }
-:}
 
-init with {: s.init();			:};
-scan with {: return s.next_token; :};
+//----Terminales----
+//-Palabras clave
+terminal BREAK, CASE, DEFAULT, ELSE, IF, MAIN, NULL, RETURN, SWITCH, WHILE;
+terminal TIPO_BOOL, TIPO_CHAR, TIPO_FLOAT, TIPO_INT, TIPO_STRING;
 
-/* Terminales */
-// Simbolos
-terminal SYMBOL, LETRA, MAIN, OBRACKET, CBRACKET, OCURBRACKET, CCURBRACKET, OSQUBRACKET, CSQUBRACKET, HASHTAG, DOT, COLON, COMMA, VAR, FUNCTION, COMMENT, EQUAL;
-terminal PLUS, MINUS, TIMES, DIV, POW, COMPLEMENT, PLUSS, MINUSS;
-terminal ANDOPERATOR, OROPERATOR, NOTOPERATOR, EQUALS, DIFFERENT, MORETHAN, LESSTHAN, MOREEQ, LESSEQ;
-temrinal IF, ELSE, WHILE, SWITCH, CASE, DEFAULT;
-terminal NUMBERD, NUMBERP, ZERO, TRUE, FALSE;
-terminal TYPEINT, TYPEFLOAT, TYPECHAR, TYPESTRING, TYPEBOOL, NULL;
-terminal SYSPRINT, SYSREAD;
+//-Entrada y salida estandar
+terminal SYSREAD, SYSPRINT;
 
-/* No terminales */
-non terminal inicio, programa, comentario, bloqueCod, return, bloqueControl, break, crearFuncion, crearParametro, funcion, parametro, sentencia, crearVar, crearAsignVar, crearElemArreglo, asignVar, asignElemArreg, salidaEst, estrucControl, if, while, switch, caso, casoDefault, condicion, expr, operando, operandoIgual, exprBin, operadorBin, exprUna, operadorUna, exprRel, operadorRel, operadorIgual, exprLog, operadorLog, id, idCuerpo, tipoFun, tipoVar, num, literal, entero, enteroPos, enteroNeg, cuerpoEnt, flotante, flotanteCero, flotantePos, flotanteNeg, caracter, string, hilera, booleano, arreglo, tipoArreglo, elemArreglo;
+//-Separadores
+terminal PARABR, PARCER, PARCURSABR, PARCURSCER, PARCUADABR, PARCUADCER;
+terminal HASHTAG, DOSPUNTOS, COMA;
 
-/* Precedencia */
-precedence left OROPERATOR;
-precedence left ANDOPERATOR;
-precedence left EQUALS, DIFFERENT;
-precedence left MORETHAN, LESSTHAN, MOREEQ, LESSEQ;
-precedence left PLUS, MINUS;
-precendece left TIMES, DIV, COMPLEMENT;
-precedence left POW;
-precedence right MINUSUNA, NOTOPERATOR;
-precedence left OSQUBRACKET, CSQUBRACKET, OBRACKET, CBRACKET, PLUSS, MINUSS;
+//-Operadores
+terminal IGUAL, MAS, MENOS, POR, DIV, POTENCIA, COMPLEMENTO;
+terminal AND, OR, NOT;
+terminal ESIGUAL, DIFERENTE, MAYOR, MENOR, MAYORIGUAL, MENORIGUAL;
+terminal MASMAS, MENOSMENOS;
 
-/* Gramatica */
+//-Literales
+terminal java.lang.Number LIT_ENTERO;
+terminal java.lang.Number LIT_FLOTANTE;
+terminal java.lang.Boolean LIT_BOOLEANO;
+terminal java.lang.Character LIT_CHAR;
+terminal java.lang.String LIT_STRING;
+
+//-Identificador
+terminal java.lang.String IDENTIF;
+
+
+//----No terminales----
+//-Estructura del programa
+non terminal inicio, programa, bloqueCod, return, bloqueControl, break;
+
+//-Funciones
+non terminal crearFuncion, crearParametro, funcion, parametro;
+
+//-Sentencias
+non terminal sentencia, crearVar, crearAsignVar, asignVar;
+non terminal crearElemArreglo, asignElemArreg;
+non terminal salidaEst;
+
+//-Estructuras de control
+non terminal estrucControl, if, while, switch, caso, casoDefault, condicion;
+
+//-Expresiones
+non terminal expr, operando, operandoIgual;
+non terminal exprBin, operadorBin;
+non terminal exprUna, operadorUna;
+non terminal exprRel, operadorRel, operadorIgual;
+non terminal exprLog, operadorLog;
+
+//-Tipos y valores
+non terminal tipoFun, tipoVar;
+non terminal literal;
+non terminal arreglo, tipoArreglo, elemArreglo;
+
+
+//----Precedencia----
+precedence left OR;
+precedence left AND;
+precedence left ESIGUAL, DIFERENTE;
+precedence left MAYOR, MENOR, MAYORIGUAL, MENORIGUAL;
+precedence left MAS, MENOS;
+precedence left POR, DIV, COMPLEMENTO;
+precedence left POTENCIA;
+precedence right NOT;
+precedence left PARCUADABR, PARCUADCER, PARABR, PARCER, MASMAS, MENOSMENOS;
+
+
+//----Gramatica----
 start with inicio;
 
-inicio ::= programa;	{: System.out.println("Inicio del programa";:}
-programa ::= tipoFunc MAIN OBRACKET CBRACKET OCURBRACKET bloqueCod CCURBRACKET
+//-Estructura del programa
+inicio ::= programa;
+programa ::= tipoFun MAIN PARABR PARCER PARCURSABR bloqueCod PARCURSCER
 			| crearFuncion programa
-			| comentario programa
-;
-comentario ::= COMMENT hilera
-			| DIV TIMES hilera TIMES DIV
 ;
 bloqueCod ::= sentencia
 			| estrucControl
 			| return
-			| comentario
 			| sentencia bloqueCod
 			| estrucControl bloqueCod
-			| comentario bloqueCod
 ;
 return ::= RETURN literal HASHTAG
 		| RETURN expr HASHTAG
-		| RETURN id HASHTAG
+		| RETURN IDENTIF HASHTAG
 		| RETURN funcion HASHTAG
 ;
 bloqueControl ::= bloqueCod
 				| break
 ;
 break ::= BREAK HASHTAG;
-crearFuncion ::= tipoFun id OBRACKET CBRACKET OCURBRACKET bloqueCod CCURBRACKET
-				| tipoFun id OBRACKET crearParametro CBRACKET OCURBRACKET bloqueCod CCURBRACKET
+
+//-Funciones
+crearFuncion ::= tipoFun IDENTIF PARABR PARCER PARCURSABR bloqueCod PARCURSCER
+				| tipoFun IDENTIF PARABR crearParametro PARCER PARCURSABR bloqueCod PARCURSCER
 ;
-crearParametro ::= tipoVar id
-				| tipoVar id COMMA crearParametro
+crearParametro ::= tipoVar IDENTIF
+				| tipoVar IDENTIF COMA crearParametro
 ;
-funcion ::= id OBRACKET CBRACKET
-		  | id OBRACKET parametro CBRACKET
-		  | SYSREAD OBRACKET CBRACKET
+funcion ::= IDENTIF PARABR PARCER
+		  | IDENTIF PARABR parametro PARCER
+		  | SYSREAD PARABR PARCER
 ;
 parametro ::= literal
 			| expr
-			| id
+			| IDENTIF
 			| funcion
-			| literal COMMA parametro
-			| expr COMMA parametro
-			| id COMMA parametro
-			| funcion COMMA parametro
+			| literal COMA parametro
+			| expr COMA parametro
+			| IDENTIF COMA parametro
+			| funcion COMA parametro
 ;
+
+//-Sentencias
 sentencia ::= crearVar HASHTAG
 			| crearAsignVar HASHTAG
 			| asignVar HASHTAG
@@ -87,187 +123,132 @@ sentencia ::= crearVar HASHTAG
 			| expr HASHTAG
 			| salidaEst HASHTAG
 ;
-crearVar ::= tipoVar:t1 id;
-crearAsignVar ::= crearVar EQUAL literal
-				| crearVar EQUAL expr
-				| crearVar EQUAL id
-				| crearVar EQUAL funcion
-				| crearVar EQUAL NULL
-				| crearVar EQUAL tipoArreglo:t2 OSQUBRACKET entero CSQUBRACKET
-				| crearVar EQUAL tipoArreglo:t2 OSQUBRACKET expr CSQUBRACKET
-				| crearVar EQUAL tipoArreglo:t2 OSQUBRACKET id CSQUBRACKET
-				| crearVar EQUAL OCURBRACKET crearElemArreglo CCURBRACKET
+crearVar ::= tipoVar IDENTIF;
+crearAsignVar ::= crearVar IGUAL literal
+				| crearVar IGUAL expr
+				| crearVar IGUAL IDENTIF
+				| crearVar IGUAL funcion
+				| crearVar IGUAL NULL
+				| crearVar IGUAL tipoArreglo PARCUADABR LIT_ENTERO PARCUADCER
+				| crearVar IGUAL tipoArreglo PARCUADABR expr PARCUADCER
+				| crearVar IGUAL tipoArreglo PARCUADABR IDENTIF PARCUADCER
+				| crearVar IGUAL PARCURSABR crearElemArreglo PARCURSCER
 ;
-crearElemArreglo ::= num
-					| caracter
-					| num COMMA crearElemArreglo
-					| caracter COMMA crearElemArreglo
+asignVar ::= IDENTIF IGUAL literal
+			| IDENTIF IGUAL expr
+			| IDENTIF IGUAL IDENTIF
+			| IDENTIF IGUAL funcion
+			| IDENTIF IGUAL NULL
 ;
-asignVar ::= id EQUAL literal
-			| id EQUAL expr
-			| id EQUAL id
-			| id EQUAL funcion
-			| id EQUAL NULL
+crearElemArreglo ::= LIT_ENTERO
+					| LIT_CHAR
+					| LIT_ENTERO COMA crearElemArreglo
+					| LIT_CHAR COMA crearElemArreglo
 ;
-asignElemArreg ::= elemArreglo EQUAL entero
-				| elemArreglo EQUAL caracter
-				| elemArreglo EQUAL expr
-				| elemArreglo EQUAL id
-				| elemArreglo EQUAL funcion
+asignElemArreg ::= elemArreglo IGUAL LIT_ENTERO
+				| elemArreglo IGUAL LIT_CHAR
+				| elemArreglo IGUAL expr
+				| elemArreglo IGUAL IDENTIF
+				| elemArreglo IGUAL funcion
 ;
-salidaEst ::= SYSPRINT OBRACKET literal CBRACKET
-			| SYSPRINT OBRACKET id CBRACKET
+salidaEst ::= SYSPRINT PARABR literal PARCER
+			| SYSPRINT PARABR IDENTIF PARCER
 ;
 
+//-Estructuras de control
 estrucControl ::= if
 				| while
 				| switch
 ;
-if ::= IF OBRACKET condicion CBRACKET OCURBRACKET bloqueControl CCURBRACKET
-	| IF OBRACKET condicion CBRACKET OCURBRACKET bloqueControl CCURBRACKET ELSE OCURBRACKET bloqueControl CCURBRACKET
+if ::= IF PARABR condicion PARCER PARCURSABR bloqueControl PARCURSCER
+	| IF PARABR condicion PARCER PARCURSABR bloqueControl PARCURSCER ELSE PARCURSABR bloqueControl PARCURSCER
 ;
-while ::= WHILE OBRACKET condicion CBRACKET OCURBRACKET bloqueControl CCURBRACKET;
-switch ::= SWITCH OBRACKET expr CBRACKET OCURBRACKET caso casoDefault CCURBRACKET
-		| SWITCH OBRACKET id CBRACKET OCURBRACKET caso casoDefault CCURBRACKET
-		| SWITCH OBRACKET funcion CBRACKET OCURBRACKET caso casoDefault CCURBRACKET
+while ::= WHILE PARABR condicion PARCER PARCURSABR bloqueControl PARCURSCER;
+switch ::= SWITCH PARABR expr PARCER PARCURSABR caso casoDefault PARCURSCER
+		| SWITCH PARABR IDENTIF PARCER PARCURSABR caso casoDefault PARCURSCER
+		| SWITCH PARABR funcion PARCER PARCURSABR caso casoDefault PARCURSCER
 ;
-caso ::= CASE COLON literal OCURBRACKET bloqueControl CCURBRACKET
-		| CASE COLON literal OCURBRACKET bloqueControl CCURBRACKET caso
+caso ::= CASE DOSPUNTOS literal PARCURSABR bloqueControl PARCURSCER
+		| CASE DOSPUNTOS literal PARCURSABR bloqueControl PARCURSCER caso
 ;
-casoDefault ::= DEFAULT OCURBRACKET bloqueControl CCURBRACKET;
-condicion ::= booleano
+casoDefault ::= DEFAULT PARCURSABR bloqueControl PARCURSCER;
+condicion ::= LIT_BOOLEANO
 			| exprRel
 			| exprLog
 ;
 
-expr ::= epxrBin
+//-Expresiones
+expr ::= exprBin
 		| exprUna
 		| exprRel
 		| exprLog
 ;
 
 operando ::= literal
-			| id
+			| IDENTIF
 			| funcion
 			| expr
-			| OBRACKET expr CBRACKET
+			| PARABR expr PARCER
 ;
 operandoIgual ::= operando
 				| NULL
 ;
 exprBin ::= operando operadorBin operando;
-operadorBin ::= PLUS
-				| MINUS
+operadorBin ::= MAS
+				| MENOS
 				| DIV
-				| TIMES
-				| COMPLEMENT
-				| POW
+				| POR
+				| COMPLEMENTO
+				| POTENCIA
 ;
 exprUna ::= operando operadorUna
-			| MINUS operando
-			%prec MINUSUNA
+			| MENOS operando
 ;
-operadorUna ::= MINUSS
-				| PLUSS
+operadorUna ::= MENOSMENOS
+				| MASMAS
 ;
 exprRel ::= operando operadorRel operando
 			| operandoIgual operadorIgual operandoIgual
 ;
-operadorRel ::= MORETHAN
-				| LESSTHAN
-				| MOREEQ
-				| LESSEQ
+operadorRel ::= MAYOR
+				| MENOR
+				| MAYORIGUAL
+				| MENORIGUAL
 ;
-operadorIgual ::= EQUALS
-				| DIFFERENT
+operadorIgual ::= ESIGUAL
+				| DIFERENTE
 ;
 exprLog ::= operando operadorLog operando
-			| NOTOPERATOR operando
+			| NOT operando
 ;
-operadorLog ::= ANDOPERATOR
-				| OROPERATOR
+operadorLog ::= AND
+				| OR
 ;
 
-//Identificadores
-id ::= LETRA
-	| LETRA idCuerpo
+//-Tipos y valores
+tipoFun ::= TIPO_INT
+			| TIPO_FLOAT
+			| TIPO_CHAR
 ;
-idCuerpo ::= LETRA
-			| NUMBERD
-			| SYMBOL
-			| LETRA idCuerpo
-			| NUMBERD idCuerpo
-			| SYMBOL idCuerpo
-;
-tipoFun ::= TYPEINT
-			| TYPEFLOAT
-			| TYPECHAR
-;
-tipoVar ::= TYPEINT
-			| TYPEFLOAT
-			| TYPECHAR
-			| TYPEBOOL
-			| TYPESTRING
+tipoVar ::= TIPO_INT
+			| TIPO_FLOAT
+			| TIPO_CHAR
+			| TIPO_BOOL
+			| TIPO_STRING
 			| arreglo
 ;
-num ::= entero
-		| flotante
-;
-literal ::= num
-			| caracter
-			| string
-			| booleano
+literal ::= LIT_ENTERO
+			| LIT_FLOTANTE
+			| LIT_CHAR
+			| LIT_STRING
+			| LIT_BOOLEANO
 			| elemArreglo
 ;
-
-//Enteros
-entero ::= ZERO
-			| enteroPos
-			| enteroNeg
+arreglo ::= tipoArreglo PARCUADABR PARCUADCER;
+tipoArreglo ::= TIPO_INT
+			| TIPO_CHAR
 ;
-enteroPos ::= NUMBERD
-			| NUMBERD cuerpoEnt
-;
-enteroNeg ::= MINUS enteroPos;
-cuerpoEnt ::= NUMBERD
-			| NUMBERD cuerpoEnt
-;
-
-//Flotantes
-flotante ::= flotanteCero
-			| flotantePos
-			| flotanteNeg
-;
-flotanteCero ::= ZERO DOT cuerpoEnt;
-flotantePos ::= enteroPos DOT cuerpoEnt;
-flotanteNeg ::= MINUS flotanteCero
-				| MINUS flotantePos
-;
-
-//Char
-caracter ::= SYMBOL LETRA SYMBOL;
-
-//String
-string ::= SYMBOL hilera SYMBOL;
-hilera ::= LETRA
-			| NUMBERD
-			| SYMBOL
-			| LETRA hilera
-			| NUMBERD hilera
-			| SYMBOL hilera
-;
-
-//Booleanos
-booleano ::= TRUE
-			| FALSE
-;
-
-//Arreglos
-arreglo ::= tipoArreglo OSQUBRACKET CSQUBRACKET;
-tipoArreglo ::= TYPEINT
-			| TYPECHAR
-;
-elemArreglo ::= id OSQUBRACKET NUMBERD CSQUBRACKET
-				| id OSQUBRACKET id CSQUBRACKET
-				| id OSQUBRACKET funcion CSQUBRACKET
+elemArreglo ::= IDENTIF PARCUADABR LIT_ENTERO PARCUADCER
+				| IDENTIF PARCUADABR IDENTIF PARCUADCER
+				| IDENTIF PARCUADABR funcion PARCUADCER
 ;
