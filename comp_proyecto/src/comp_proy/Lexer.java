@@ -686,10 +686,10 @@ public class Lexer implements java_cup.runtime.Scanner {
 
 	//Fabricas de simbolos
 	private Symbol symbol(int type) {
-		return new Symbol(type, yyline, yycolumn);
+		return new ExtendedSymbol(type, yyline+1, yycolumn+1);
 	}
 	private Symbol symbol(int type, Object value) {
-		return new Symbol(type, yyline, yycolumn, value);
+		return new ExtendedSymbol(type, yyline+1, yycolumn+1, value);
 	}
 
 

@@ -2,9 +2,7 @@ package comp_proy;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
-import java.io.InputStreamReader;
 import javax.swing.JFileChooser;
 
 /**
@@ -24,9 +22,10 @@ public class Main {
             try {
                 Parser p = new Parser(new Lexer(new BufferedReader(new FileReader(archivo))));
                 Object result = p.parse().value;
+                System.out.println("El archivo se puede compilar.");
             }
             catch (Exception e) {
-                e.printStackTrace();
+                System.out.println("El archivo no se puede compilar.");
             }
         } else {
             System.out.println("Operación cancelada.");

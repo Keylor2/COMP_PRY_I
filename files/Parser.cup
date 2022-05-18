@@ -3,6 +3,16 @@ import java_cup.runtime.*;
 
 class Parser;
 
+parser code  {: 
+  public void report_error(String message, Object info) {
+    StringBuilder m = new StringBuilder(message + ": ");
+
+    if (info instanceof java_cup.runtime.Symbol) 
+      m.append( info.toString() );
+    
+    System.out.println(m);
+  }
+:};
 
 //----Terminales----
 //-Palabras clave
@@ -124,6 +134,7 @@ sentencia ::= crearVar HASHTAG
 			| asignVar HASHTAG
 			| asignElemArreg HASHTAG
 			| expr HASHTAG
+			| funcion HASHTAG
 			| salidaEst HASHTAG
 ;
 crearVar ::= tipoVar IDENTIF;
