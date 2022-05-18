@@ -1,4 +1,7 @@
+package comp_proy;
 import java_cup.runtime.*;
+
+class Parser;
 
 
 //----Terminales----
@@ -190,9 +193,7 @@ operando ::= literal
 			| expr
 			| PARABR expr PARCER
 ;
-operandoIgual ::= operando
-				| NULL
-;
+operandoIgual ::= NULL;
 exprBin ::= operando operadorBin operando;
 operadorBin ::= MAS
 				| MENOS
@@ -208,7 +209,8 @@ operadorUna ::= MENOSMENOS
 				| MASMAS
 ;
 exprRel ::= operando operadorRel operando
-			| operandoIgual operadorIgual operandoIgual
+			| operando operadorIgual operando
+			| operando operadorIgual operandoIgual
 ;
 operadorRel ::= MAYOR
 				| MENOR
